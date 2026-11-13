@@ -129,3 +129,30 @@ Still to validate:
 
 This deployment is intended as a local Kubernetes demonstration
 and is not a production-ready public inference service.
+
+## CPU Performance Benchmark
+
+Environment:
+- Model: Qwen/Qwen3-0.6B
+- Runtime: vLLM 0.28.0, CPU-only
+- Platform: Kubernetes / Minikube
+- Requests: 3 sequential streaming requests
+- Output: 64 tokens per request
+
+Results:
+
+| Run | TTFT | Total latency | Decode speed |
+|-----|------|---------------|--------------|
+| 1 | 2433.4 ms | 12778.1 ms | 6.09 tok/s |
+| 2 | 315.9 ms | 10830.0 ms | 5.99 tok/s |
+| 3 | 302.3 ms | 11020.9 ms | 5.88 tok/s |
+
+Average TTFT: 1017.2 ms
+Average latency: 11543.0 ms
+Average decode speed: 5.99 tok/s
+
+The first request had noticeably higher TTFT.
+These measurements represent sequential local CPU inference,
+not maximum throughput under concurrent load.
+
+Raw measurements: benchmarks/results.json

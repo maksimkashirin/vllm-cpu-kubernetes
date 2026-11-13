@@ -1,0 +1,30 @@
+{
+  "model": "Qwen/Qwen3-0.6B",
+  "runs": 3,
+  "average_ttft_ms": 1017.2,
+  "average_latency_ms": 11543.0,
+  "average_decode_tokens_per_second": 5.99,
+  "measurements": [
+    {
+      "run": 1,
+      "ttft_ms": 2433.4,
+      "latency_ms": 12778.1,
+      "output_tokens": 64,
+      "decode_tokens_per_second": 6.09
+    },
+    {
+      "run": 2,
+      "ttft_ms": 315.9,
+      "latency_ms": 10830.0,
+      "output_tokens": 64,
+      "decode_tokens_per_second": 5.99
+    },
+    {
+      "run": 3,
+      "ttft_ms": 302.3,
+      "latency_ms": 11020.9,
+      "output_tokens": 64,
+      "decode_tokens_per_second": 5.88
+    }
+  ]
+}
