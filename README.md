@@ -1,4 +1,4 @@
-﻿# vLLM CPU Inference on Kubernetes
+# vLLM CPU Inference on Kubernetes
 
 Deploy vLLM 0.28.0 with Qwen3-0.6B on Kubernetes using Minikube and Docker.
 
@@ -26,7 +26,7 @@ The project provides a CPU-only OpenAI-compatible inference API.
 
 1. Docker provides the custom vLLM CPU image.
 2. Kubernetes Deployment runs vLLM as non-root UID 10001.
-3. An initContainer verifies or downloads model weights.
+3. A separate rootless initContainer verifies or downloads model weights.
 4. PVC preserves the Hugging Face model cache.
 5. ConfigMap stores inference configuration.
 6. Kubernetes Secret stores the API key.
@@ -86,7 +86,7 @@ The smoke tests verify:
 - Writable cache directories use mounted volumes.
 - The Service uses ClusterIP.
 - The API key is stored in a Kubernetes Secret.
-- Request and output logging are disabled in vLLM configuration.
+- Prompt/output logging is disabled; request_audit.py logs inference endpoint and status without request bodies.
 
 The API key protects supported vLLM API routes, not necessarily
 every HTTP endpoint. Do not expose the service publicly without
@@ -107,23 +107,17 @@ The model is persisted in PVC model-cache.
 ## Current validation status
 
 Verified:
-- Local CPU inference
-- Rootless Docker execution
-- Kubernetes Deployment readiness
-- Model loading from an existing PVC
-- Successful initContainer cache validation
-- Bearer authentication on /v1/models
-- Chat completion HTTP 200
-- Kustomize deployment
-- Automated deployment with -SkipBuild
-- Automated smoke tests
-- Absence of a test prompt marker in inspected logs
-
-Still to validate:
-- Fresh deployment using an empty PVC
-- Full dependency pinning and build reproducibility
-- Performance benchmarking
-- Comprehensive logging and security audit
+- CPU-only inference with vLLM 0.28.0
+- Rootless vLLM and rootless model-loader images
+- Successful Kubernetes Deployment
+- Automatic model download into a fresh test PVC
+- Offline model-cache reuse and SHA256 verification
+- Kubernetes Secret and ConfigMap
+- Kustomize and automated deployment
+- Build-time Python dependency verification
+- Bearer authentication and smoke tests
+- Privacy-safe inference audit logging
+- Short/long prompt load tests
 
 ## Notes
 
@@ -159,7 +153,7 @@ Raw measurements: benchmarks/results.json
 
 ## Load Testing: Short vs Long Prompts
 
-Run: python .\scripts\load-test.py --port 8003
+Start port-forward on port 8003, then run: python .\scripts\load-test.py --port 8003
 
 | Prompt | Clients | Tokens | TTFT (ms) | Latency (ms) | Throughput (tok/s) |
 |---|---:|---:|---:|---:|---:|
