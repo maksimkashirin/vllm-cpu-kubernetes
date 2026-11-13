@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-permissions-check
+  namespace: kaspersky-ml
+spec:
+  restartPolicy: Never
+
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 10001
+    fsGroup: 10001
+    seccompProfile:
+      type: RuntimeDefault
+
+  containers:
+    - name: check
+      image: busybox:1.36
+
+      command:
+        - /bin/sh
+        - -c
+
+      args:
+        - |
+          id
+          touch /models/.write-test &&
+          rm /models/.write-test &&
+          echo PVC_WRITE_OK
+
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+
+      volumeMounts:
+        - name: model-cache
+          mountPath: /models
+
+  volumes:
+    - name: model-cache
+      persistentVolumeClaim:
+        claimName: model-cache

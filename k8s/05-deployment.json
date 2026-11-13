@@ -1,0 +1,239 @@
+{
+    "spec":  {
+                 "selector":  {
+                                  "matchLabels":  {
+                                                      "app":  "kaspersky-vllm"
+                                                  }
+                              },
+                 "replicas":  1,
+                 "template":  {
+                                  "metadata":  {
+                                                   "labels":  {
+                                                                  "app":  "kaspersky-vllm"
+                                                              }
+                                               },
+                                  "spec":  {
+                                               "securityContext":  {
+                                                                       "runAsUser":  10001,
+                                                                       "seccompProfile":  {
+                                                                                              "type":  "RuntimeDefault"
+                                                                                          },
+                                                                       "runAsNonRoot":  true,
+                                                                       "fsGroup":  10001,
+                                                                       "runAsGroup":  10001
+                                                                   },
+                                               "volumes":  [
+                                                               {
+                                                                   "persistentVolumeClaim":  {
+                                                                                                 "claimName":  "model-cache"
+                                                                                             },
+                                                                   "name":  "model-cache"
+                                                               },
+                                                               {
+                                                                   "name":  "config",
+                                                                   "configMap":  {
+                                                                                     "name":  "kaspersky-vllm-config"
+                                                                                 }
+                                                               },
+                                                               {
+                                                                   "emptyDir":  {
+
+                                                                                },
+                                                                   "name":  "tmp"
+                                                               },
+                                                               {
+                                                                   "emptyDir":  {
+
+                                                                                },
+                                                                   "name":  "app-cache"
+                                                               },
+                                                               {
+                                                                   "emptyDir":  {
+                                                                                    "medium":  "Memory",
+                                                                                    "sizeLimit":  "1Gi"
+                                                                                },
+                                                                   "name":  "shm"
+                                                               }
+                                                           ],
+                                               "terminationGracePeriodSeconds":  60,
+                                               "containers":  [
+                                                                  {
+                                                                      "image":  "kaspersky-vllm:0.28.0-rootless",
+                                                                      "resources":  {
+                                                                                        "limits":  {
+                                                                                                       "cpu":  "6",
+                                                                                                       "memory":  "9Gi"
+                                                                                                   },
+                                                                                        "requests":  {
+                                                                                                         "cpu":  "2",
+                                                                                                         "memory":  "6Gi"
+                                                                                                     }
+                                                                                    },
+                                                                      "imagePullPolicy":  "Never",
+                                                                      "args":  [
+                                                                                   "serve",
+                                                                                   "--config",
+                                                                                   "/etc/vllm/serve.yaml"
+                                                                               ],
+                                                                      "ports":  [
+                                                                                    {
+                                                                                        "containerPort":  8000
+                                                                                    }
+                                                                                ],
+                                                                      "readinessProbe":  {
+                                                                                             "periodSeconds":  10,
+                                                                                             "httpGet":  {
+                                                                                                             "path":  "/health",
+                                                                                                             "port":  8000
+                                                                                                         }
+                                                                                         },
+                                                                      "volumeMounts":  [
+                                                                                           {
+                                                                                               "mountPath":  "/models",
+                                                                                               "name":  "model-cache"
+                                                                                           },
+                                                                                           {
+                                                                                               "mountPath":  "/etc/vllm",
+                                                                                               "name":  "config",
+                                                                                               "readOnly":  true
+                                                                                           },
+                                                                                           {
+                                                                                               "mountPath":  "/tmp",
+                                                                                               "name":  "tmp"
+                                                                                           },
+                                                                                           {
+                                                                                               "mountPath":  "/home/app/.cache",
+                                                                                               "name":  "app-cache"
+                                                                                           },
+                                                                                           {
+                                                                                               "mountPath":  "/dev/shm",
+                                                                                               "name":  "shm"
+                                                                                           }
+                                                                                       ],
+                                                                      "name":  "vllm",
+                                                                      "env":  [
+                                                                                  {
+                                                                                      "value":  "/models",
+                                                                                      "name":  "HF_HOME"
+                                                                                  },
+                                                                                  {
+                                                                                      "value":  "1",
+                                                                                      "name":  "HF_HUB_OFFLINE"
+                                                                                  },
+                                                                                  {
+                                                                                      "value":  "1",
+                                                                                      "name":  "VLLM_CPU_KVCACHE_SPACE"
+                                                                                  },
+                                                                                  {
+                                                                                      "value":  "1",
+                                                                                      "name":  "VLLM_NO_USAGE_STATS"
+                                                                                  },
+                                                                                  {
+                                                                                      "valueFrom":  {
+                                                                                                        "secretKeyRef":  {
+                                                                                                                             "key":  "VLLM_API_KEY",
+                                                                                                                             "name":  "kaspersky-vllm-auth"
+                                                                                                                         }
+                                                                                                    },
+                                                                                      "name":  "VLLM_API_KEY"
+                                                                                  },
+                                                                                  {
+                                                                                      "name":  "TRITON_CACHE_DIR",
+                                                                                      "value":  "/tmp/triton"
+                                                                                  }
+                                                                              ],
+                                                                      "securityContext":  {
+                                                                                              "allowPrivilegeEscalation":  false,
+                                                                                              "readOnlyRootFilesystem":  true,
+                                                                                              "capabilities":  {
+                                                                                                                   "drop":  [
+                                                                                                                                "ALL"
+                                                                                                                            ]
+                                                                                                               }
+                                                                                          },
+                                                                      "startupProbe":  {
+                                                                                           "periodSeconds":  10,
+                                                                                           "failureThreshold":  90,
+                                                                                           "httpGet":  {
+                                                                                                           "path":  "/health",
+                                                                                                           "port":  8000
+                                                                                                       }
+                                                                                       }
+                                                                  }
+                                                              ],
+                                               "enableServiceLinks":  false,
+                                               "automountServiceAccountToken":  false,
+                                               "initContainers":  [
+                                                                      {
+                                                                          "imagePullPolicy":  "Never",
+                                                                          "resources":  {
+                                                                                            "limits":  {
+                                                                                                           "cpu":  "2",
+                                                                                                           "memory":  "2Gi"
+                                                                                                       },
+                                                                                            "requests":  {
+                                                                                                             "cpu":  "500m",
+                                                                                                             "memory":  "512Mi"
+                                                                                                         }
+                                                                                        },
+                                                                          "name":  "model-preload",
+                                                                          "volumeMounts":  [
+                                                                                               {
+                                                                                                   "mountPath":  "/models",
+                                                                                                   "name":  "model-cache"
+                                                                                               },
+                                                                                               {
+                                                                                                   "mountPath":  "/tmp",
+                                                                                                   "name":  "tmp"
+                                                                                               },
+                                                                                               {
+                                                                                                   "mountPath":  "/home/app/.cache",
+                                                                                                   "name":  "app-cache"
+                                                                                               }
+                                                                                           ],
+                                                                          "securityContext":  {
+                                                                                                  "allowPrivilegeEscalation":  false,
+                                                                                                  "readOnlyRootFilesystem":  true,
+                                                                                                  "capabilities":  {
+                                                                                                                       "drop":  [
+                                                                                                                                    "ALL"
+                                                                                                                                ]
+                                                                                                                   }
+                                                                                              },
+                                                                          "command":  [
+                                                                                          "python",
+                                                                                          "-c",
+                                                                                          "import hashlib\nfrom pathlib import Path\nfrom huggingface_hub import snapshot_download\n\nREPO = \"Qwen/Qwen3-0.6B\"\nREV = \"c1899de289a04d12100db370d81485cdf75e47ca\"\nHASH = \"f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b\"\n\nbase = Path(\"/models/hub/models--Qwen--Qwen3-0.6B\")\nsnapshot = base / \"snapshots\" / REV\nweights = base / \"blobs\" / HASH\n\nrequired = [\n    \"config.json\",\n    \"generation_config.json\",\n    \"merges.txt\",\n    \"model.safetensors\",\n    \"tokenizer.json\",\n    \"tokenizer_config.json\",\n    \"vocab.json\",\n]\n\ndef valid_cache():\n    if not all((snapshot / name).is_file() for name in required):\n        return False\n\n    if not weights.is_file():\n        return False\n\n    with weights.open(\"rb\") as f:\n        digest = hashlib.file_digest(f, \"sha256\").hexdigest()\n\n    return digest == HASH\n\nif not valid_cache():\n    print(\"MODEL_CACHE_MISSING_OR_CORRUPT\", flush=True)\n    snapshot_download(\n        repo_id=REPO,\n        revision=REV,\n        cache_dir=\"/models/hub\",\n        allow_patterns=[\"*.json\", \"*.txt\", \"*.safetensors\"],\n        force_download=True,\n    )\nelse:\n    print(\"MODEL_CACHE_VERIFIED\", flush=True)\n\nrefs = base / \"refs\"\nrefs.mkdir(parents=True, exist_ok=True)\n(refs / \"main\").write_text(REV)\n\nif not valid_cache():\n    raise RuntimeError(\"Model cache validation failed\")\n\nprint(\"MODEL_READY\", flush=True)"
+                                                                                      ],
+                                                                          "image":  "kaspersky-vllm:0.28.0-rootless",
+                                                                          "env":  [
+                                                                                      {
+                                                                                          "value":  "/models",
+                                                                                          "name":  "HF_HOME"
+                                                                                      },
+                                                                                      {
+                                                                                          "valueFrom":  {
+                                                                                                            "secretKeyRef":  {
+                                                                                                                                 "key":  "HF_TOKEN",
+                                                                                                                                 "name":  "kaspersky-vllm-auth",
+                                                                                                                                 "optional":  true
+                                                                                                                             }
+                                                                                                        },
+                                                                                          "name":  "HF_TOKEN"
+                                                                                      }
+                                                                                  ]
+                                                                      }
+                                                                  ]
+                                           }
+                              },
+                 "strategy":  {
+                                  "type":  "Recreate"
+                              }
+             },
+    "metadata":  {
+                     "namespace":  "kaspersky-ml",
+                     "name":  "kaspersky-vllm"
+                 },
+    "apiVersion":  "apps/v1",
+    "kind":  "Deployment"
+}

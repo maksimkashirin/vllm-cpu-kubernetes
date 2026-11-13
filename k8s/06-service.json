@@ -1,0 +1,21 @@
+{
+    "spec":  {
+                 "selector":  {
+                                  "app":  "kaspersky-vllm"
+                              },
+                 "ports":  [
+                               {
+                                   "port":  8000,
+                                   "protocol":  "TCP",
+                                   "targetPort":  8000
+                               }
+                           ],
+                 "type":  "ClusterIP"
+             },
+    "metadata":  {
+                     "namespace":  "kaspersky-ml",
+                     "name":  "kaspersky-vllm-svc"
+                 },
+    "apiVersion":  "v1",
+    "kind":  "Service"
+}
