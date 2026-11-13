@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 $project = $PSScriptRoot
 $k8s = Join-Path $project "k8s"
 $image = "kaspersky-vllm:0.28.0-audit"
+$loaderImage = "kaspersky-loader:1.0.0"
 $namespace = "kaspersky-ml"
 
 function Check-ExitCode($step) {
@@ -30,6 +31,14 @@ if (-not $SkipBuild) {
 
     minikube image load $image
     Check-ExitCode "Minikube image load"
+
+    Write-Host "=== BUILDING LOADER IMAGE ==="
+    docker build -f "$project\Dockerfile.loader" -t $loaderImage $project
+    Check-ExitCode "Loader Docker build"
+
+    Write-Host "=== LOADING LOADER IMAGE ==="
+    minikube image load $loaderImage
+    Check-ExitCode "Loader image load"
 }
 else {
     Write-Host "=== USING EXISTING IMAGE ==="
@@ -39,6 +48,14 @@ else {
 
     if (-not ($images | Select-String -SimpleMatch $image)) {
         throw "Image not found. Run without -SkipBuild."
+    }
+}
+
+$imagesAfterLoad = minikube image ls
+Check-ExitCode "Required images"
+foreach ($requiredImage in @($image, $loaderImage)) {
+    if (-not ($imagesAfterLoad | Select-String -SimpleMatch $requiredImage)) {
+        throw "Image not found in Minikube: $requiredImage"
     }
 }
 
