@@ -16,6 +16,8 @@ ENV HOME=/home/app \
     VLLM_CPU_KVCACHE_SPACE=1
 
 COPY --chown=10001:10001 requirements.txt /home/app/requirements.lock
+COPY --chown=10001:10001 request_audit.py /home/app/request_audit.py
+ENV PYTHONPATH=/home/app
 
 WORKDIR /home/app
 

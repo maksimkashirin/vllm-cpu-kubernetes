@@ -7,3 +7,6 @@ enable-log-requests: false
 enable-log-outputs: false
 host: "0.0.0.0"
 port: 8000
+
+middleware:
+  - request_audit.audit_inference

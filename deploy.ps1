@@ -1,4 +1,4 @@
-﻿param(
+param(
     [switch]$SkipBuild
 )
 
@@ -6,7 +6,7 @@ $ErrorActionPreference = "Stop"
 
 $project = $PSScriptRoot
 $k8s = Join-Path $project "k8s"
-$image = "kaspersky-vllm:0.28.0-rootless"
+$image = "kaspersky-vllm:0.28.0-audit"
 $namespace = "kaspersky-ml"
 
 function Check-ExitCode($step) {
