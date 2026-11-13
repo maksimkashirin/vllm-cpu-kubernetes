@@ -16,6 +16,7 @@ ENV HOME=/home/app \
     VLLM_CPU_KVCACHE_SPACE=1
 
 COPY --chown=10001:10001 requirements.txt /home/app/requirements.lock
+RUN python -c "import pathlib,subprocess,sys; pinned=set(pathlib.Path('/home/app/requirements.lock').read_text().splitlines()); actual=set(subprocess.check_output([sys.executable,'-m','pip','freeze'],text=True).splitlines()); assert pinned == actual, 'Dependency mismatch'; print('DEPENDENCIES VERIFIED')" && python -m pip check
 COPY --chown=10001:10001 request_audit.py /home/app/request_audit.py
 ENV PYTHONPATH=/home/app
 

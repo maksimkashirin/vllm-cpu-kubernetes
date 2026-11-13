@@ -156,3 +156,21 @@ These measurements represent sequential local CPU inference,
 not maximum throughput under concurrent load.
 
 Raw measurements: benchmarks/results.json
+
+## Load Testing: Short vs Long Prompts
+
+Run: python .\scripts\load-test.py --port 8003
+
+| Prompt | Clients | Tokens | TTFT (ms) | Latency (ms) | Throughput (tok/s) |
+|---|---:|---:|---:|---:|---:|
+| Short | 1 | 21 | 4356.3 | 12095.4 | 3.97 |
+| Short | 2 | 21 | 5981.4 | 13969.4 | 5.76 |
+| Long | 1 | 319 | 906.7 | 9038.0 | 5.31 |
+| Long | 2 | 319 | 6349.9 | 14304.6 | 5.61 |
+
+### Performance Analysis
+Many short requests: tune max-num-seqs and max-num-batched-tokens to improve batching and throughput.
+Few long-context requests: evaluate max-model-len, KV-cache capacity and chunked prefill.
+Two concurrent clients increased TTFT. Results may include warm-up effects.
+These optimizations are proposed, not experimentally validated.
+Raw data: benchmarks/load-results.json

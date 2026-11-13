@@ -1,0 +1,122 @@
+[
+  {
+    "scenario": "short",
+    "concurrency": 1,
+    "requests": 3,
+    "prompt_tokens": 21,
+    "avg_ttft_ms": 4356.3,
+    "avg_latency_ms": 12095.4,
+    "output_throughput_tok_s": 3.97,
+    "requests_per_second": 0.083,
+    "samples": [
+      {
+        "ttft_ms": 12398.3,
+        "latency_ms": 20185.2,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 317.5,
+        "latency_ms": 7912.4,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 353.1,
+        "latency_ms": 8188.5,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      }
+    ]
+  },
+  {
+    "scenario": "short",
+    "concurrency": 2,
+    "requests": 3,
+    "prompt_tokens": 21,
+    "avg_ttft_ms": 5981.4,
+    "avg_latency_ms": 13969.4,
+    "output_throughput_tok_s": 5.76,
+    "requests_per_second": 0.12,
+    "samples": [
+      {
+        "ttft_ms": 9036.8,
+        "latency_ms": 16914.8,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 413.7,
+        "latency_ms": 8728.4,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 8493.8,
+        "latency_ms": 16265.1,
+        "prompt_tokens": 21,
+        "completion_tokens": 48
+      }
+    ]
+  },
+  {
+    "scenario": "long",
+    "concurrency": 1,
+    "requests": 3,
+    "prompt_tokens": 319,
+    "avg_ttft_ms": 906.7,
+    "avg_latency_ms": 9038.0,
+    "output_throughput_tok_s": 5.31,
+    "requests_per_second": 0.111,
+    "samples": [
+      {
+        "ttft_ms": 1623.2,
+        "latency_ms": 9743.5,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 579.7,
+        "latency_ms": 8880.3,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 517.3,
+        "latency_ms": 8490.2,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      }
+    ]
+  },
+  {
+    "scenario": "long",
+    "concurrency": 2,
+    "requests": 3,
+    "prompt_tokens": 319,
+    "avg_ttft_ms": 6349.9,
+    "avg_latency_ms": 14304.6,
+    "output_throughput_tok_s": 5.61,
+    "requests_per_second": 0.117,
+    "samples": [
+      {
+        "ttft_ms": 9132.8,
+        "latency_ms": 17244.3,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 682.5,
+        "latency_ms": 8639.5,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      },
+      {
+        "ttft_ms": 9234.4,
+        "latency_ms": 17030.0,
+        "prompt_tokens": 319,
+        "completion_tokens": 48
+      }
+    ]
+  }
+]
